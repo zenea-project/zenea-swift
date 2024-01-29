@@ -9,8 +9,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.92.1"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.2.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0"),
-        .package(url: "https://github.com/apple/swift-foundation.git", branch: "main")
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0")
     ],
     targets: [
         .executableTarget(
