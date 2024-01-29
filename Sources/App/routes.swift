@@ -1,9 +1,10 @@
 import Vapor
 import zenea
 import zenea_fs
+import NIOFileSystem
 
 func routes(_ app: Application) throws {
-    let blocks = BlockFS("~/.zenea")
+    let blocks = BlockFS(NSString("~/.zenea").expandingTildeInPath as String)
     
     app.get { req async in
         return Response(status: .notFound, body: "Nothing to see here. Please go do something with your life.")

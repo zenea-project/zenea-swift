@@ -10,6 +10,10 @@ public class BlockFS: BlockStorage {
         self.zeneaURL = FilePath(path)
     }
     
+    public init(_ path: FilePath) {
+        self.zeneaURL = path
+    }
+    
     public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {
         var url = zeneaURL
         url.append("blocks")
@@ -18,6 +22,8 @@ public class BlockFS: BlockStorage {
         url.append(String(hash[0..<2]))
         url.append(String(hash[2..<4]))
         url.append(String(hash[4...]))
+        
+        print(url)
         
         do {
             let handle = try await FileSystem.shared.openFile(forReadingAt: url)
@@ -31,6 +37,7 @@ public class BlockFS: BlockStorage {
             
             return .success(block)
         } catch {
+            print(error)
             return .failure(.notFound)
         }
     }

@@ -12,11 +12,12 @@ enum Entrypoint {
         
         do {
             try await configure(app)
+            try await app.startup()
+            try await app.running?.onStop.get()
         } catch {
             app.logger.report(error: error)
             throw error
         }
-        try await app.execute()
     }
 }
 
@@ -27,4 +28,5 @@ public func configure(_ app: Application) async throws {
 
     // register routes
     try routes(app)
+    app.http.server.configuration.port = 4096
 }
