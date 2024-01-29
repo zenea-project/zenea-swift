@@ -6,8 +6,8 @@ import utils
 public class BlockFS: BlockStorage {
     public var zeneaURL: FilePath
     
-    public init(_ path: URL) {
-        self.zeneaURL = FilePath(path.path)
+    public init(_ path: String) {
+        self.zeneaURL = FilePath(path)
     }
     
     public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {

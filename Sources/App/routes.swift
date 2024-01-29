@@ -3,7 +3,7 @@ import zenea
 import zenea_fs
 
 func routes(_ app: Application) throws {
-    let blocks = BlockFS(URL(fileURLWithPath: ".zenea", relativeTo: .homeDirectory))
+    let blocks = BlockFS("~/.zenea")
     
     app.get { req async in
         return Response(status: .notFound, body: "Nothing to see here. Please go do something with your life.")
