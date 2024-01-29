@@ -16,7 +16,6 @@ let package = Package(
             name: "App",
             dependencies: [
                 .product(name: "Vapor", package: "vapor"),
-                .product(name: "NIO", package: "swift-nio"),
                 .target(name: "zenea"),
                 .target(name: "zenea-fs")
             ]
@@ -24,6 +23,7 @@ let package = Package(
         .target(
             name: "zenea-fs",
             dependencies: [
+                .product(name: "_NIOFileSystem", package: "swift-nio"),
                 .target(name: "zenea"),
                 .target(name: "utils")
             ]

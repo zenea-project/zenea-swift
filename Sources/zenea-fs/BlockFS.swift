@@ -1,32 +1,32 @@
+import NIOFileSystem
 import Foundation
 import zenea
 import utils
 
 public class BlockFS: BlockStorage {
-    public var zeneaURL: URL
+    public var zeneaURL: FilePath
     
     public init(_ path: URL) {
-        self.zeneaURL = path
+        self.zeneaURL = FilePath(path.path)
     }
     
     public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {
         var url = zeneaURL
-        url.appendPathComponent("blocks")
+        url.append("blocks")
         
         let hash = id.hash.toHexString()
-        url.appendPathComponent(String(hash[0..<2]))
-        url.appendPathComponent(String(hash[2..<4]))
-        url.appendPathComponent(String(hash[4...]))
+        url.append(String(hash[0..<2]))
+        url.append(String(hash[2..<4]))
+        url.append(String(hash[4...]))
         
         do {
-            let handle = try FileHandle(forReadingFrom: url)
-            var fileContent = Data()
+            let handle = try await FileSystem.shared.openFile(forReadingAt: url)
+            defer { Task { try? await handle.close() } }
             
-            for try await byte in handle.bytes {
-                fileContent += [byte]
-            }
+            var buffer = try await handle.readToEnd(maximumSizeAllowed: .bytes(1<<16))
+            guard let data = buffer.readBytes(length: buffer.readableBytes) else { return .failure(.notFound) }
             
-            let block = Block(content: fileContent)
+            let block = Block(content: Data(data))
             guard block.matchesID(id) else { return .failure(.invalidContent) }
             
             return .success(block)
@@ -39,22 +39,22 @@ public class BlockFS: BlockStorage {
         let block = Block(content: content)
         
         var url = zeneaURL
-        url.appendPathComponent("blocks")
+        url.append("blocks")
         
         let hash = block.id.hash.toHexString()
-        url.appendPathComponent(String(hash[0..<2]))
-        url.appendPathComponent(String(hash[2..<4]))
-        url.appendPathComponent(String(hash[4...]))
+        url.append(String(hash[0..<2]))
+        url.append(String(hash[2..<4]))
+        url.append(String(hash[4...]))
         
         var isDir: ObjCBool = false
-        guard !FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else {
+        guard !FileManager.default.fileExists(atPath: url.string, isDirectory: &isDir) else {
             return isDir.boolValue ? .unable : .exists
         }
         
-        let parent = url.deletingLastPathComponent()
-        if !FileManager.default.fileExists(atPath: parent.path, isDirectory: &isDir) {
+        let parent = url.removingLastComponent()
+        if !FileManager.default.fileExists(atPath: parent.string, isDirectory: &isDir) {
             do {
-                try FileManager.default.createDirectory(atPath: parent.path, withIntermediateDirectories: true)
+                try FileManager.default.createDirectory(atPath: parent.string, withIntermediateDirectories: true)
             } catch {
                 return .unable
             }
@@ -63,8 +63,10 @@ public class BlockFS: BlockStorage {
         }
         
         do {
-            let handle = try FileHandle(forWritingTo: url)
-            try handle.write(contentsOf: block.content)
+            let handle = try await FileSystem.shared.openFile(forWritingAt: url, options: .newFile(replaceExisting: false))
+            defer { Task { try? await handle.close() } }
+            
+            try await handle.write(contentsOf: block.content, toAbsoluteOffset: 0)
         } catch {
             return .unable
         }
