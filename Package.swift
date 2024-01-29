@@ -24,7 +24,8 @@ let package = Package(
         .target(
             name: "zenea-fs",
             dependencies: [
-                .target(name: "zenea")
+                .target(name: "zenea"),
+                .target(name: "utils")
             ]
         ),
         .target(
