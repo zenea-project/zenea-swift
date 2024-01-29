@@ -7,16 +7,24 @@ let package = Package(
        .macOS(.v13)
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.89.0"),
-        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.0.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.92.1"),
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.2.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0")
     ],
     targets: [
         .executableTarget(
             name: "App",
             dependencies: [
                 .product(name: "Vapor", package: "vapor"),
+                .product(name: "NIO", package: "swift-nio"),
                 .target(name: "zenea"),
-                .target(name: "utils")
+                .target(name: "zenea-fs")
+            ]
+        ),
+        .target(
+            name: "zenea-fs",
+            dependencies: [
+                .target(name: "zenea")
             ]
         ),
         .target(

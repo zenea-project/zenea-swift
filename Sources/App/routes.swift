@@ -1,8 +1,10 @@
 import Vapor
 import zenea
-import utils
+import zenea_fs
 
 func routes(_ app: Application) throws {
+    let blocks = BlockFS(URL(fileURLWithPath: ".zenea", relativeTo: .homeDirectory))
+    
     app.get { req async in
         return Response(status: .notFound, body: "Nothing to see here. Please go do something with your life.")
     }
@@ -24,8 +26,35 @@ func routes(_ app: Application) throws {
             return Response(status: .badRequest, body: "what the hell is that supposed to be")
         }
         
-        switch blockID {
-        case .sha256(let hash): return Response(body: Response.Body(stringLiteral: hash.toHexString()))
+        switch await blocks.fetchBlock(id: blockID) {
+        case .success(let block): return Response(body: Response.Body(data: block.content))
+        case .failure(let error):
+            switch error {
+            case .notFound: return Response(status: .notFound, body: "nope, haven't seen it")
+            case .invalidContent: return Response(status: .internalServerError, body: "idfk")
+            }
+        }
+    }
+    
+    app.post("block") { req async in
+        do {
+            guard var contentBuffer = try await req.body.collect(max: 2<<16).get() else {
+                return Response(status: .noContent, body: "come on give me something")
+            }
+            
+            guard let data = contentBuffer.readData(length: contentBuffer.readableBytes, byteTransferStrategy: .noCopy) else {
+                return Response(status: .noContent, body: "come on give me something")
+            }
+            
+            switch await blocks.putBlock(content: data) {
+            case nil: return Response(status: .ok)
+            case .exists: return Response(status: .ok)
+            case .unavailable: return Response(status: .badGateway, body: "not my fault")
+            case .notPermitted: return Response(status: .forbidden, body: "you shall not pass")
+            case .unable: return Response(status: .internalServerError, body: "idk didn't work")
+            }
+        } catch {
+            return Response(status: .noContent, body: "come on give me something")
         }
     }
 }
