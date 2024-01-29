@@ -35,10 +35,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "utils",
-            dependencies: [
-                .product(name: "FoundationPreview", package: "swift-foundation")
-            ]
+            name: "utils"
         )
     ]
 )
