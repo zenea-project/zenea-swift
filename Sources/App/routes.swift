@@ -33,6 +33,7 @@ func routes(_ app: Application) throws {
             switch error {
             case .notFound: return Response(status: .notFound, body: "nope, haven't seen it")
             case .invalidContent: return Response(status: .internalServerError, body: "idfk")
+            case .unable: return Response(status: .internalServerError, body: "something went wrong")
             }
         }
     }
@@ -40,22 +41,29 @@ func routes(_ app: Application) throws {
     app.post("block") { req async in
         do {
             guard var contentBuffer = try await req.body.collect(max: 2<<16).get() else {
-                return Response(status: .noContent, body: "come on give me something")
+                return Response(status: .badRequest, body: "come on give me something")
             }
             
             guard let data = contentBuffer.readData(length: contentBuffer.readableBytes, byteTransferStrategy: .noCopy) else {
-                return Response(status: .noContent, body: "come on give me something")
+                return Response(status: .badRequest, body: "come on give me something")
             }
             
             switch await blocks.putBlock(content: data) {
-            case nil: return Response(status: .ok)
-            case .exists: return Response(status: .ok)
-            case .unavailable: return Response(status: .badGateway, body: "not my fault")
-            case .notPermitted: return Response(status: .forbidden, body: "you shall not pass")
-            case .unable: return Response(status: .internalServerError, body: "idk didn't work")
+            case .success(let blockID):
+                guard let data = blockID.description.data(using: .utf8) else {
+                    return Response(status: .internalServerError, body: "idfk")
+                }
+                return Response(status: .ok, body: .init(data: data))
+            case .failure(let error):
+                switch error {
+                case .exists: return Response(status: .notFound, body: "we already have one, thanks")
+                case .unavailable: return Response(status: .badGateway, body: "not my fault")
+                case .notPermitted: return Response(status: .forbidden, body: "you shall not pass")
+                case .unable: return Response(status: .internalServerError, body: "idk didn't work")
+                }
             }
         } catch {
-            return Response(status: .noContent, body: "come on give me something")
+            return Response(status: .internalServerError, body: "come on give me something")
         }
     }
 }

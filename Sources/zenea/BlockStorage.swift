@@ -2,11 +2,12 @@ import Foundation
 
 public protocol BlockStorage {
     func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError>
-    func putBlock(content: Data) async -> BlockPutError?
+    func putBlock(content: Data) async -> Result<Block.ID, BlockPutError>
 }
 
 public enum BlockFetchError: Error {
     case notFound
+    case unable
     case invalidContent
 }
 

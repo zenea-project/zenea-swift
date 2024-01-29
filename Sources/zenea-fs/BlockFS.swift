@@ -23,26 +23,31 @@ public class BlockFS: BlockStorage {
         url.append(String(hash[2..<4]))
         url.append(String(hash[4...]))
         
-        print(url)
-        
+        let handle: ReadFileHandle
         do {
-            let handle = try await FileSystem.shared.openFile(forReadingAt: url)
-            defer { Task { try? await handle.close() } }
-            
-            var buffer = try await handle.readToEnd(maximumSizeAllowed: .bytes(1<<16))
-            guard let data = buffer.readBytes(length: buffer.readableBytes) else { return .failure(.notFound) }
-            
-            let block = Block(content: Data(data))
-            guard block.matchesID(id) else { return .failure(.invalidContent) }
-            
-            return .success(block)
+            handle = try await FileSystem.shared.openFile(forReadingAt: url)
         } catch {
-            print(error)
             return .failure(.notFound)
         }
+        
+        defer { Task { try? await handle.close() } }
+        
+        let fileContent: Data
+        do {
+            var buffer = try await handle.readToEnd(maximumSizeAllowed: .bytes(1<<16))
+            guard let data = buffer.readBytes(length: buffer.readableBytes) else { return .failure(.unable) }
+            fileContent = Data(data)
+        } catch {
+            return .failure(.unable)
+        }
+        
+        let block = Block(content: fileContent)
+        guard block.matchesID(id) else { return .failure(.invalidContent) }
+        
+        return .success(block)
     }
     
-    public func putBlock(content: Data) async -> BlockPutError? {
+    public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
         let block = Block(content: content)
         
         var url = zeneaURL
@@ -55,7 +60,7 @@ public class BlockFS: BlockStorage {
         
         var isDir: ObjCBool = false
         guard !FileManager.default.fileExists(atPath: url.string, isDirectory: &isDir) else {
-            return isDir.boolValue ? .unable : .exists
+            return isDir.boolValue ? .failure(.unable) : .failure(.exists)
         }
         
         let parent = url.removingLastComponent()
@@ -63,10 +68,10 @@ public class BlockFS: BlockStorage {
             do {
                 try FileManager.default.createDirectory(atPath: parent.string, withIntermediateDirectories: true)
             } catch {
-                return .unable
+                return .failure(.unable)
             }
         } else if !isDir.boolValue {
-            return .unable
+            return .failure(.unable)
         }
         
         do {
@@ -75,9 +80,9 @@ public class BlockFS: BlockStorage {
             
             try await handle.write(contentsOf: block.content, toAbsoluteOffset: 0)
         } catch {
-            return .unable
+            return .failure(.unable)
         }
         
-        return nil
+        return .success(block.id)
     }
 }
