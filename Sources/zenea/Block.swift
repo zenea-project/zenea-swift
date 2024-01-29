@@ -10,6 +10,11 @@ public struct Block: Identifiable, Hashable {
         
         public var algorithm: Algorithm
         public var hash: [UInt8]
+        
+        public init(algorithm: Algorithm, hash: [UInt8]) {
+            self.algorithm = algorithm
+            self.hash = hash
+        }
     }
     
     public var id: Self.ID

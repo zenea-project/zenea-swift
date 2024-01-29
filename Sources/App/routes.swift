@@ -66,4 +66,18 @@ func routes(_ app: Application) throws {
             return Response(status: .internalServerError, body: "come on give me something")
         }
     }
+    
+    app.get("blocks") { _ async in
+        switch await blocks.listBlocks() {
+        case .success(let blocks):
+            let body = blocks.map { $0.description }.joined(separator: ",")
+            guard let data = body.data(using: .utf8) else { return Response(status: .internalServerError, body: "i hate unicode") }
+            
+            return Response(status: .ok, body: Response.Body(data: data))
+        case .failure(let error):
+            switch error {
+            case .unable: return Response(status: .internalServerError, body: "something went wrong")
+            }
+        }
+    }
 }

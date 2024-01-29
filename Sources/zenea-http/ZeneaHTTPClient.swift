@@ -38,7 +38,7 @@ public class ZeneaHTTPClient: BlockStorage {
     }
     
     public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {
-        let response = client.get(url: server.construct() + "/blocks/" + id.description)
+        let response = client.get(url: server.construct() + "/block/" + id.description)
         
         do {
             let result = try await response.get()
@@ -63,7 +63,7 @@ public class ZeneaHTTPClient: BlockStorage {
     
     public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
         let block = Block(content: content)
-        let response = client.post(url: server.construct() + "/blocks/" + block.id.description)
+        let response = client.post(url: server.construct() + "/block/" + block.id.description)
         
         do {
             let result = try await response.get()
@@ -86,6 +86,36 @@ public class ZeneaHTTPClient: BlockStorage {
             return .success(block.id)
         } catch {
             return .failure(.unavailable)
+        }
+    }
+    
+    public func listBlocks() async -> Result<Set<Block.ID>, BlockListError> {
+        let response = client.get(url: server.construct() + "/blocks")
+        
+        do {
+            let result = try await response.get()
+            
+            switch result.status {
+            case .ok: break
+            case .internalServerError: return .failure(.unable)
+            default: return .failure(.unable)
+            }
+            
+            guard var body = result.body else { return .failure(.unable) }
+            guard let data = body.readData(length: body.readableBytes) else { return .failure(.unable) }
+            guard let string = String(data: data, encoding: .utf8) else { return .failure(.unable) }
+            
+            var results: Set<Block.ID> = []
+            
+            let values = string.split(separator: ",")
+            for value in values {
+                guard let id = Block.ID(parsing: String(value)) else { continue }
+                results.insert(id)
+            }
+            
+            return .success(results)
+        } catch {
+            return .failure(.unable)
         }
     }
 }

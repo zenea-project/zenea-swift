@@ -32,6 +32,7 @@ let package = Package(
             name: "zenea-http",
             dependencies: [
                 .product(name: "Vapor", package: "vapor"),
+                .product(name: "Crypto", package: "swift-crypto"),
                 .target(name: "zenea")
             ]
         ),
