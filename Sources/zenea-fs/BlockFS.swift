@@ -19,7 +19,12 @@ public class BlockFS: BlockStorage {
         url.appendPathComponent(String(hash[4...]))
         
         do {
-            let (fileContent, _) = try await URLSession.shared.data(from: url)
+            let handle = try FileHandle(forReadingFrom: url)
+            var fileContent = Data()
+            
+            for try await byte in handle.bytes {
+                fileContent += [byte]
+            }
             
             let block = Block(content: fileContent)
             guard block.matchesID(id) else { return .failure(.invalidContent) }
