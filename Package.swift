@@ -4,12 +4,13 @@ import PackageDescription
 let package = Package(
     name: "zenea-swift",
     platforms: [
-       .macOS(.v13)
+        .macOS("13.3")
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.92.1"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.2.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0")
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0"),
+        .package(url: "https://github.com/apple/swift-foundation.git", branch: "main")
     ],
     targets: [
         .executableTarget(
@@ -35,7 +36,10 @@ let package = Package(
             ]
         ),
         .target(
-            name: "utils"
+            name: "utils",
+            dependencies: [
+                .product(name: "FoundationPreview", package: "swift-foundation")
+            ]
         )
     ]
 )
