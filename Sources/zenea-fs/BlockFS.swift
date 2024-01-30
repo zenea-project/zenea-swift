@@ -60,7 +60,6 @@ public class BlockFS: BlockStorage {
         url.append(String(hash[4...]))
         
         var isDir: ObjCBool = false
-        print(url.string)
         if FileManager.default.fileExists(atPath: url.string, isDirectory: &isDir) {
             return isDir.boolValue ? .failure(.unable) : .failure(.exists)
         }
