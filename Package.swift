@@ -6,6 +6,10 @@ let package = Package(
     platforms: [
         .macOS("13.3")
     ],
+    products: [
+        .executable(name: "zenea-server", targets: ["App"]),
+        .library(name: "zenea", targets: ["zenea", "zenea-fs", "zenea-http"])
+    ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.92.1"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.2.0"),

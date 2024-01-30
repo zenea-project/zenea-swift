@@ -2,7 +2,7 @@ import Foundation
 
 public protocol BlockStorage {
     func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError>
-    func putBlock(content: Data) async -> Result<Block.ID, BlockPutError>
+    @discardableResult func putBlock(content: Data) async -> Result<Block.ID, BlockPutError>
     func listBlocks() async -> Result<Set<Block.ID>, BlockListError>
 }
 
