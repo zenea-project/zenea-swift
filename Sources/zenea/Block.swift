@@ -80,3 +80,7 @@ extension Block {
         }
     }
 }
+
+extension Block.ID: Identifiable {
+    public var id: Self { self }
+}
