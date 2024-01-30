@@ -63,7 +63,7 @@ public class ZeneaHTTPClient: BlockStorage {
     
     public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
         let block = Block(content: content)
-        let response = client.post(url: server.construct() + "/block")
+        let response = client.post(url: server.construct() + "/block", body: .data(block.content))
         
         do {
             let result = try await response.get()
@@ -80,12 +80,8 @@ public class ZeneaHTTPClient: BlockStorage {
             guard var body = result.body else { return .failure(.unable) }
             guard let data = body.readData(length: body.readableBytes) else { return .failure(.unable) }
             
-            print(data)
-            
             guard let dataString = String(data: data, encoding: .utf8) else { return .failure(.unable) }
-            print(dataString)
             guard let id = Block.ID(parsing: dataString) else { return .failure(.unable) }
-            print(id)
             guard block.matchesID(id) else { return .failure(.unable) }
             
             return .success(block.id)
