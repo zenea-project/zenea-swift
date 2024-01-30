@@ -63,7 +63,7 @@ public class ZeneaHTTPClient: BlockStorage {
     
     public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
         let block = Block(content: content)
-        let response = client.post(url: server.construct() + "/block/" + block.id.description)
+        let response = client.post(url: server.construct() + "/block")
         
         do {
             let result = try await response.get()
