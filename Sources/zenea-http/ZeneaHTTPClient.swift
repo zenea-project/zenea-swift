@@ -67,6 +67,7 @@ public class ZeneaHTTPClient: BlockStorage {
         
         do {
             let result = try await response.get()
+            print(result)
             
             switch result.status {
             case .ok: break
@@ -79,12 +80,17 @@ public class ZeneaHTTPClient: BlockStorage {
             guard var body = result.body else { return .failure(.unable) }
             guard let data = body.readData(length: body.readableBytes) else { return .failure(.unable) }
             
+            print(data)
+            
             guard let dataString = String(data: data, encoding: .utf8) else { return .failure(.unable) }
+            print(dataString)
             guard let id = Block.ID(parsing: dataString) else { return .failure(.unable) }
+            print(id)
             guard block.matchesID(id) else { return .failure(.unable) }
             
             return .success(block.id)
         } catch {
+            print(error)
             return .failure(.unavailable)
         }
     }
