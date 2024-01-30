@@ -11,3 +11,6 @@ db.sqlite
 ! .env.example
 .vscode
 Package.resolved
+
+# logs
+log
