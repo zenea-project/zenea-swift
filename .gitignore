@@ -14,3 +14,6 @@ Package.resolved
 
 # logs
 log
+
+# obsidian
+.obsidian
