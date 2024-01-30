@@ -67,7 +67,6 @@ public class ZeneaHTTPClient: BlockStorage {
         
         do {
             let result = try await response.get()
-            print(result)
             
             switch result.status {
             case .ok: break
@@ -86,7 +85,6 @@ public class ZeneaHTTPClient: BlockStorage {
             
             return .success(block.id)
         } catch {
-            print(error)
             return .failure(.unavailable)
         }
     }
