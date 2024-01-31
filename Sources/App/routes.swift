@@ -1,7 +1,6 @@
 import Vapor
 import zenea
 import zenea_fs
-import NIOFileSystem
 
 func routes(_ app: Application) throws {
     let blocks = BlockFS(NSString("~/.zenea").expandingTildeInPath as String)
