@@ -22,3 +22,5 @@ Download the latest version of Swift, but at least version 5.9.2. On macOS, the 
 You'll be able to import and use the library targets `zenea`, `zenea-fs` and `zenea-http` simply by including this package in your swift dependencies.
 
 To run the web server provided by the `App` target, `cd` into whatever directory this readme file is in and execute `swift run`. This will automatically install all additional dependencies and compile everything.
+
+NOTE: This package may not work on systems that do not provide an adequate `Foundation` library. In any recent release of macOS, this should not be a problem. However, on Linux systems you might be using an older version of the library or it might be missing entirely. Apple is currently working on making an [open-source swift version](https://github.com/apple/swift-foundation) of that package that can be used as a dependency on all systems, but as it is still in an early stage, you could run into problems compiling this package.
