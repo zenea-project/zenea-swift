@@ -1,5 +1,6 @@
 # About zenea-swift
 This package is a swift implementation of the [Zenea Project](https://github.com/glasfisch3000/zenea) Data Layer.
+
 It includes the following targets:
 ### `zenea`
 A base library providing types and protocols.
@@ -17,5 +18,7 @@ An executable web server application, providing web access to a local block stor
 - [`Entrypoint`](Sources/App/entrypoint.swift) - provides a starting point for the Vapor app life cycle.
 # How to Use
 Download the latest version of Swift, but at least version 5.9.2. On macOS, the recommended way to do this is by downloading the Xcode app. On Linux, you'll want to use [swiftly](https://github.com/swift-server/swiftly).
+
 You'll be able to import and use the library targets `zenea`, `zenea-fs` and `zenea-http` simply by including this package in your swift dependencies.
+
 To run the web server provided by the `App` target, `cd` into whatever directory this readme file is in and execute `swift run`.
