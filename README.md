@@ -10,7 +10,7 @@ A base library providing types and protocols.
 A local-file-based block storage system, built on [swift-nio's](https://github.com/apple/swift-nio) `NIOFileSystem`.
 - [`BlockFS`](Sources/zenea-fs/BlockFS.swift) - a file system implementation of the `BlockStorage` protocol.
 ### `zenea-http`
-An HTTP client for a web-based block storage system, built on [vapor](https://github.com/vapor/vapor).
+An HTTP client for a web-based block storage system, built on [Vapor](https://github.com/vapor/vapor).
 - [`ZeneaHTTPClient`](Sources/zenea-http/ZeneaHTTPClient.swift) - an HTTP client implementation of the `BlockStorage` protocol.
 ### `App`
 An executable web server application, providing web access to a local block storage. It is built on [vapor](https://github.com/vapor/vapor) and utilises `BlockFS`.
