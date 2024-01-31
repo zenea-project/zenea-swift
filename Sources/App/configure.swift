@@ -2,7 +2,7 @@ import Vapor
 import zenea
 import zenea_fs
 
-func routes(_ app: Application) throws {
+func configure(_ app: Application) throws {
     let blocks = BlockFS(NSString("~/.zenea").expandingTildeInPath as String)
     
     app.get { req async in
@@ -79,4 +79,6 @@ func routes(_ app: Application) throws {
             }
         }
     }
+    
+    app.http.server.configuration.port = 4096
 }
