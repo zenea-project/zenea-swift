@@ -21,4 +21,4 @@ Download the latest version of Swift, but at least version 5.9.2. On macOS, the 
 
 You'll be able to import and use the library targets `zenea`, `zenea-fs` and `zenea-http` simply by including this package in your swift dependencies.
 
-To run the web server provided by the `App` target, `cd` into whatever directory this readme file is in and execute `swift run`.
+To run the web server provided by the `App` target, `cd` into whatever directory this readme file is in and execute `swift run`. This will automatically install all additional dependencies and compile everything.
