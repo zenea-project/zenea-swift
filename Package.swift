@@ -7,7 +7,6 @@ let package = Package(
         .macOS("13.3")
     ],
     products: [
-        .executable(name: "zenea-server", targets: ["App"]),
         .library(name: "zenea", targets: ["zenea", "zenea-fs", "zenea-http"])
     ],
     dependencies: [
