@@ -15,14 +15,6 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0")
     ],
     targets: [
-        .executableTarget(
-            name: "App",
-            dependencies: [
-                .product(name: "Vapor", package: "vapor"),
-                .target(name: "zenea"),
-                .target(name: "zenea-fs")
-            ]
-        ),
         .target(
             name: "zenea-fs",
             dependencies: [
