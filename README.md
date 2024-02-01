@@ -1,5 +1,5 @@
 # About zenea-swift
-This package is a swift implementation of the [Zenea Project](https://github.com/glasfisch3000/zenea) Data Layer.
+This package is a swift library for the [Zenea Project](https://github.com/glasfisch3000/zenea) Data Layer.
 
 It includes the following targets:
 ### `zenea`
@@ -12,15 +12,9 @@ A local-file-based block storage system, built on [swift-nio's](https://github.c
 ### `zenea-http`
 An HTTP client for a web-based block storage system, built on [Vapor](https://github.com/vapor/vapor).
 - [`ZeneaHTTPClient`](Sources/zenea-http/ZeneaHTTPClient.swift) - an HTTP client implementation of the `BlockStorage` protocol.
-### `App`
-An executable web server application, providing web access to a local block storage. It is built on [vapor](https://github.com/vapor/vapor) and utilises `BlockFS`.
-- [`configure(_:)`](Sources/App/configure.swift) - configures an `Application` object to serve HTTP requests.
-- [`Entrypoint`](Sources/App/entrypoint.swift) - provides a starting point for the Vapor app life cycle.
 # How to Use
-Download the latest version of Swift, but at least version 5.9.2. On macOS, the recommended way to do this is by downloading the Xcode app. On Linux, you'll want to use [swiftly](https://github.com/swift-server/swiftly).
+If you haven't already, download the latest version of Swift, but at least version 5.9.2. On macOS, the recommended way to do this is by downloading the Xcode app. On Linux, you'll want to use [swiftly](https://github.com/swift-server/swiftly).
 
-You'll be able to import and use the library targets `zenea`, `zenea-fs` and `zenea-http` simply by including this package in your swift dependencies.
-
-To run the web server provided by the `App` target, `cd` into whatever directory this readme file is in and execute `swift run`. This will automatically install all additional dependencies and compile everything.
+To use the library targets `zenea`, `zenea-fs` and `zenea-http`, simply include this package in your swift dependencies.
 
 NOTE: This package may not work on systems that do not provide an adequate `Foundation` library. In any recent release of macOS, this should not be a problem. However, on Linux systems you might be using an older version of the library or it might be missing entirely. Apple is currently working on making an [open-source swift version](https://github.com/apple/swift-foundation) of that package that can be used as a dependency on all systems, but as it is still in an early stage, you could run into problems compiling this package.
