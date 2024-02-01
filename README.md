@@ -2,16 +2,20 @@
 This package is a swift library for the [Zenea Project](https://github.com/glasfisch3000/zenea) Data Layer.
 
 It includes the following targets:
+
 ### `zenea`
 A base library providing types and protocols.
 - [`Block`](Sources/zenea/Block.swift) - an implementation of a Zenea Data Layer block with ID and content.
 - [`BlockStorage`](Sources/zenea/BlockStorage.swift) - a protocol for storage systems that can list, fetch or put blocks.
+
 ### `zenea-fs`
 A local-file-based block storage system, built on [swift-nio's](https://github.com/apple/swift-nio) `NIOFileSystem`.
 - [`BlockFS`](Sources/zenea-fs/BlockFS.swift) - a file system implementation of the `BlockStorage` protocol.
+
 ### `zenea-http`
 An HTTP client for a web-based block storage system, built on [Vapor](https://github.com/vapor/vapor).
 - [`ZeneaHTTPClient`](Sources/zenea-http/ZeneaHTTPClient.swift) - an HTTP client implementation of the `BlockStorage` protocol.
+
 # How to Use
 If you haven't already, download the latest version of Swift, but at least version 5.9.2. On macOS, the recommended way to do this is by downloading the Xcode app. On Linux, you'll want to use [swiftly](https://github.com/swift-server/swiftly).
 
