@@ -14,7 +14,9 @@ extension Array where Element == UInt8 {
             self[i/2] = (char1 & 0xf) << 4 | (char2 & 0xf)
         }
     }
-    
+}
+
+extension Collection where Element == UInt8 {
     public func toHexString() -> String {
         return self.reduce(into: "") {
             if let (char1, char2) = convertHexToChars($1) {
