@@ -2,9 +2,9 @@ import Foundation
 import Crypto
 import utils
 
-public struct Block: Identifiable, Hashable {
-    public struct ID: Hashable {
-        public enum Algorithm: String, Hashable {
+public struct Block {
+    public struct ID {
+        public enum Algorithm: String {
             case sha2_256 = "sha2-256"
         }
         
@@ -35,14 +35,13 @@ public struct Block: Identifiable, Hashable {
     }
 }
 
-extension Block.ID.Algorithm {
-    public init?(parsing string: String) {
-        switch string {
-        case "sha2-256", "sha2_256", "sha-256", "sha_256", "sha256": self = .sha2_256
-        default: return nil
-        }
-    }
+extension Block: Identifiable, Hashable, Codable {}
+
+extension Block.ID: Identifiable, Hashable, Codable {
+    public var id: Self { self }
 }
+
+extension Block.ID.Algorithm: Hashable, Codable { }
 
 extension Block.ID: CustomStringConvertible {
     fileprivate static let _blockIDPattern = try! Regex("(?<algorithm>sha2?-256|sha256)-(?<hash>[A-Fa-f0-9]+)")
@@ -68,6 +67,19 @@ extension Block.ID: CustomStringConvertible {
     }
 }
 
+extension Block.ID.Algorithm: CustomStringConvertible {
+    public init?(parsing string: String) {
+        switch string {
+        case "sha2-256", "sha2_256", "sha-256", "sha_256", "sha256": self = .sha2_256
+        default: return nil
+        }
+    }
+    
+    public var description: String {
+        self.rawValue
+    }
+}
+
 extension Block {
     public func matchesID(_ id: ID) -> Bool {
         switch id.algorithm {
@@ -79,8 +91,4 @@ extension Block {
             return id.hash.elementsEqual(hash)
         }
     }
-}
-
-extension Block.ID: Identifiable {
-    public var id: Self { self }
 }
