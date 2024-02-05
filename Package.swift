@@ -7,7 +7,7 @@ let package = Package(
         .macOS("13.3")
     ],
     products: [
-        .library(name: "zenea-swift", targets: ["zenea", "zenea-fs", "zenea-http"])
+        .library(name: "zenea", targets: ["zenea", "zenea-fs", "zenea-http"])
     ],
     dependencies: [
         .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.9.0"),
