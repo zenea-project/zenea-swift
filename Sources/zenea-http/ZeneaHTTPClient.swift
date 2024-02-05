@@ -1,5 +1,5 @@
-import Vapor
 import Foundation
+import AsyncHTTPClient
 import zenea
 
 public class ZeneaHTTPClient: BlockStorage {
