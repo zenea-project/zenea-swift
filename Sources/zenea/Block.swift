@@ -33,6 +33,17 @@ public struct Block {
             self.id = .init(algorithm: .sha2_256, hash: hash.map { $0 })
         }
     }
+    
+    public func matchesID(_ id: ID) -> Bool {
+        switch id.algorithm {
+        case .sha2_256:
+            var hasher = SHA256()
+            hasher.update(data: self.content)
+            
+            let hash = hasher.finalize()
+            return id.hash.elementsEqual(hash)
+        }
+    }
 }
 
 extension Block: Identifiable, Hashable, Codable {}
@@ -77,18 +88,5 @@ extension Block.ID.Algorithm: CustomStringConvertible {
     
     public var description: String {
         self.rawValue
-    }
-}
-
-extension Block {
-    public func matchesID(_ id: ID) -> Bool {
-        switch id.algorithm {
-        case .sha2_256:
-            var hasher = SHA256()
-            hasher.update(data: self.content)
-            
-            let hash = hasher.finalize()
-            return id.hash.elementsEqual(hash)
-        }
     }
 }

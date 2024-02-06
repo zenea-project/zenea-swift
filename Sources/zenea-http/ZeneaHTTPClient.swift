@@ -133,3 +133,6 @@ extension ZeneaHTTPClient.Scheme: CustomStringConvertible {
 extension ZeneaHTTPClient.Server: CustomStringConvertible {
     public var description: String { self.construct() }
 }
+
+extension ZeneaHTTPClient.Scheme: Codable {}
+extension ZeneaHTTPClient.Server: Codable {}
