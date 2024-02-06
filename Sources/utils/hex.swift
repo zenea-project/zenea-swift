@@ -16,6 +16,22 @@ extension Array where Element == UInt8 {
     }
 }
 
+extension Data {
+    public init?(hexString: String) {
+        guard hexString.count.isMultiple(of: 2), !hexString.isEmpty else { return nil }
+        self.init(repeating: 0, count: hexString.count/2)
+        
+        let stringBytes: [UInt8] = Array(hexString.data(using: String.Encoding.utf8)!)
+        
+        for i in stride(from: stringBytes.startIndex, to: stringBytes.endIndex - 1, by: 2) {
+            guard let char1 = convertCharToHex(stringBytes[i]) else { return nil }
+            guard let char2 = convertCharToHex(stringBytes[i + 1]) else { return nil }
+            
+            self[i/2] = (char1 & 0xf) << 4 | (char2 & 0xf)
+        }
+    }
+}
+
 extension Collection where Element == UInt8 {
     public func toHexString() -> String {
         return self.reduce(into: "") {
