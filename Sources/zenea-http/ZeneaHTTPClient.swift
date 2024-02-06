@@ -28,8 +28,8 @@ public class ZeneaHTTPClient: BlockStorage {
             default: return .failure(.unable)
             }
             
-            guard var body = result.body else { return .failure(.invalidContent) }
-            guard let data = body.readData(length: body.readableBytes) else { return .failure(.invalidContent) }
+            guard let body = result.body else { return .failure(.invalidContent) }
+            guard let data = body.getData(at: 0, length: body.readableBytes) else { return .failure(.invalidContent) }
             
             let block = Block(content: data)
             guard block.matchesID(id) else { return .failure(.invalidContent) }
@@ -55,8 +55,8 @@ public class ZeneaHTTPClient: BlockStorage {
             default: return .failure(.unable)
             }
             
-            guard var body = result.body else { return .failure(.unable) }
-            guard let data = body.readData(length: body.readableBytes) else { return .failure(.unable) }
+            guard let body = result.body else { return .failure(.unable) }
+            guard let data = body.getData(at: 0, length: body.readableBytes) else { return .failure(.unable) }
             
             guard let dataString = String(data: data, encoding: .utf8) else { return .failure(.unable) }
             guard let id = Block.ID(parsing: dataString) else { return .failure(.unable) }
@@ -80,8 +80,8 @@ public class ZeneaHTTPClient: BlockStorage {
             default: return .failure(.unable)
             }
             
-            guard var body = result.body else { return .failure(.unable) }
-            guard let data = body.readData(length: body.readableBytes) else { return .failure(.unable) }
+            guard let body = result.body else { return .failure(.unable) }
+            guard let data = body.getData(at: 0, length: body.readableBytes) else { return .failure(.unable) }
             guard let string = String(data: data, encoding: .utf8) else { return .failure(.unable) }
             
             var results: Set<Block.ID> = []
