@@ -146,3 +146,7 @@ public class BlockFS: BlockStorage {
         return handle.listContents(recursive: false)
     }
 }
+
+extension BlockFS {
+    public var description: String { self.zeneaURL.string }
+}

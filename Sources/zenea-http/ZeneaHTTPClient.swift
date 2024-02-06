@@ -3,27 +3,6 @@ import AsyncHTTPClient
 import zenea
 
 public class ZeneaHTTPClient: BlockStorage {
-    public enum Scheme: String, Equatable, Hashable {
-        case http
-        case https
-    }
-    
-    public struct Server: Hashable {
-        public var scheme: Scheme
-        public var address: String
-        public var port: Int
-        
-        public init(scheme: Scheme, address: String, port: Int) {
-            self.scheme = scheme
-            self.address = address
-            self.port = port
-        }
-        
-        public func construct() -> String {
-            "\(self.scheme.rawValue)://\(self.address):\(self.port)"
-        }
-    }
-    
     public var server: Server
     public var client: HTTPClient
     
@@ -118,4 +97,39 @@ public class ZeneaHTTPClient: BlockStorage {
             return .failure(.unable)
         }
     }
+}
+
+extension ZeneaHTTPClient {
+    public enum Scheme: String, Equatable, Hashable {
+        case http
+        case https
+    }
+    
+    public struct Server: Hashable {
+        public var scheme: Scheme
+        public var address: String
+        public var port: Int
+        
+        public init(scheme: Scheme, address: String, port: Int) {
+            self.scheme = scheme
+            self.address = address
+            self.port = port
+        }
+        
+        public func construct() -> String {
+            "\(self.scheme)://\(self.address):\(self.port)"
+        }
+    }
+}
+
+extension ZeneaHTTPClient: CustomStringConvertible {
+    public var description: String { self.server.description }
+}
+
+extension ZeneaHTTPClient.Scheme: CustomStringConvertible {
+    public var description: String { self.rawValue }
+}
+
+extension ZeneaHTTPClient.Server: CustomStringConvertible {
+    public var description: String { self.construct() }
 }
