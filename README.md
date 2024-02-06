@@ -13,7 +13,7 @@ A local-file-based block storage system, built on [swift-nio's](https://github.c
 - [`BlockFS`](Sources/zenea-fs/BlockFS.swift) - a file system implementation of the `BlockStorage` protocol.
 
 ### `zenea-http`
-An HTTP client for a web-based block storage system, built on [async-http-client](https://github.com/swift-server/async-http-client).
+An HTTP client for a web-based block storage system, built on [Vapor](https://github.com/vapor/vapor).
 - [`ZeneaHTTPClient`](Sources/zenea-http/ZeneaHTTPClient.swift) - an HTTP client implementation of the `BlockStorage` protocol.
 
 # How to Use

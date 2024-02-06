@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "zenea", targets: ["zenea", "zenea-fs", "zenea-http"])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.9.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.92.1"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.2.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0")
     ],
@@ -26,7 +26,7 @@ let package = Package(
         .target(
             name: "zenea-http",
             dependencies: [
-                .product(name: "AsyncHTTPClient", package: "async-http-client"),
+                .product(name: "Vapor", package: "vapor"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .target(name: "zenea")
             ]
