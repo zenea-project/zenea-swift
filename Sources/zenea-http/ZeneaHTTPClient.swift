@@ -1,4 +1,3 @@
-import Foundation
 import AsyncHTTPClient
 import zenea
 
@@ -40,7 +39,7 @@ public class ZeneaHTTPClient: BlockStorage {
         }
     }
     
-    public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
+    public func putBlock(content: Block.Content) async -> Result<Block.ID, BlockPutError> {
         let block = Block(content: content)
         let response = client.post(url: server.construct() + "/block", body: .data(block.content))
         

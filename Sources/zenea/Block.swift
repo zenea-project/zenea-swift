@@ -17,8 +17,10 @@ public struct Block {
         }
     }
     
+    public typealias Content = Data
+    
     public var id: Self.ID
-    public var content: Data
+    public var content: Content
     
     public init(id: Self.ID? = nil, content: Data) {
         self.content = content
