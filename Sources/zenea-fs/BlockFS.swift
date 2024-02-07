@@ -15,6 +15,87 @@ public class BlockFS: BlockStorage {
         self.zeneaURL = path
     }
     
+    public func listBlocks() async -> Result<Set<Block.ID>, BlockListError> {
+        var url = zeneaURL
+        url.append("blocks")
+        
+        var blocks: Set<Block.ID> = []
+        
+        guard let files1 = await scanDir(url) else { return .failure(.unable) }
+        
+        do {
+            for try await file1 in files1 {
+                guard file1.type == .directory else { continue }
+                
+                guard let decoded1 = [UInt8](hexString: file1.name.string) else { continue }
+                guard decoded1.count == 1 else { continue }
+                
+                guard let files2 = await scanDir(file1.path) else { continue }
+                
+                do {
+                    for try await file2 in files2 {
+                        guard file2.type == .directory else { continue }
+                        
+                        guard let decoded2 = [UInt8](hexString: file2.name.string) else { continue }
+                        guard decoded2.count == 1 else { continue }
+                        
+                        guard let files3 = await scanDir(file2.path) else { continue }
+                        
+                        do {
+                            for try await file3 in files3 {
+                                guard file3.type == .regular else { continue }
+                                
+                                guard let decoded3 = [UInt8](hexString: file3.name.string) else { continue }
+                                guard decoded3.count == SHA256.Digest.byteCount-2 else { continue }
+                                
+                                let id = Block.ID(algorithm: .sha2_256, hash: decoded1+decoded2+decoded3)
+                                blocks.insert(id)
+                            }
+                        } catch {}
+                    }
+                } catch {}
+            }
+        } catch {}
+        
+        return .success(blocks)
+    }
+    
+    private func scanDir(_ dir: FilePath) async -> DirectoryEntries? {
+        let handle: DirectoryFileHandle
+        
+        do {
+            handle = try await FileSystem.shared.openDirectory(atPath: dir)
+        } catch {
+            return nil
+        }
+        
+        defer { Task { try? await handle.close() } }
+        
+        return handle.listContents(recursive: false)
+    }
+    
+    public func checkBlock(id: Block.ID) async -> Result<Bool, BlockCheckError> {
+        var url = zeneaURL
+        url.append("blocks")
+        
+        let hash = id.hash.toHexString()
+        url.append(String(hash[0..<2]))
+        url.append(String(hash[2..<4]))
+        url.append(String(hash[4...]))
+        
+        do {
+            let info = try await FileSystem.shared.info(forFileAt: url)
+            guard let info = info else { return .success(false) }
+            
+            guard info.type == .regular else { return .failure(.unable) }
+            return .success(true)
+        } catch let error as FileSystemError where error.code == .notFound {
+            return .success(false)
+        } catch {
+            return .failure(.unable)
+        }
+    }
+    
     public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {
         var url = zeneaURL
         url.append("blocks")
@@ -85,65 +166,6 @@ public class BlockFS: BlockStorage {
         }
         
         return .success(block.id)
-    }
-    
-    public func listBlocks() async -> Result<Set<Block.ID>, BlockListError> {
-        var url = zeneaURL
-        url.append("blocks")
-        
-        var blocks: Set<Block.ID> = []
-        
-        guard let files1 = await scanDir(url) else { return .failure(.unable) }
-        
-        do {
-            for try await file1 in files1 {
-                guard file1.type == .directory else { continue }
-                
-                guard let decoded1 = [UInt8](hexString: file1.name.string) else { continue }
-                guard decoded1.count == 1 else { continue }
-                
-                guard let files2 = await scanDir(file1.path) else { continue }
-                
-                do {
-                    for try await file2 in files2 {
-                        guard file2.type == .directory else { continue }
-                        
-                        guard let decoded2 = [UInt8](hexString: file2.name.string) else { continue }
-                        guard decoded2.count == 1 else { continue }
-                        
-                        guard let files3 = await scanDir(file2.path) else { continue }
-                        
-                        do {
-                            for try await file3 in files3 {
-                                guard file3.type == .regular else { continue }
-                                
-                                guard let decoded3 = [UInt8](hexString: file3.name.string) else { continue }
-                                guard decoded3.count == SHA256.Digest.byteCount-2 else { continue }
-                                
-                                let id = Block.ID(algorithm: .sha2_256, hash: decoded1+decoded2+decoded3)
-                                blocks.insert(id)
-                            }
-                        } catch {}
-                    }
-                } catch {}
-            }
-        } catch {}
-        
-        return .success(blocks)
-    }
-    
-    private func scanDir(_ dir: FilePath) async -> DirectoryEntries? {
-        let handle: DirectoryFileHandle
-        
-        do {
-            handle = try await FileSystem.shared.openDirectory(atPath: dir)
-        } catch {
-            return nil
-        }
-        
-        defer { Task { try? await handle.close() } }
-        
-        return handle.listContents(recursive: false)
     }
 }
 

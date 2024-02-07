@@ -1,16 +1,20 @@
+public enum BlockListError: Error {
+    case unable
+}
+
+public enum BlockCheckError: Error {
+    case unable
+}
+
 public enum BlockFetchError: Error {
     case notFound
-    case unable
     case invalidContent
+    case unable
 }
 
 public enum BlockPutError: Error {
     case unavailable
     case notPermitted
     case exists
-    case unable
-}
-
-public enum BlockListError: Error {
     case unable
 }

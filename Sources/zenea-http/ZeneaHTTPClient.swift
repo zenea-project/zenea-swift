@@ -15,6 +15,52 @@ public class ZeneaHTTPClient: BlockStorage {
         self.client = client
     }
     
+    public func listBlocks() async -> Result<Set<Block.ID>, BlockListError> {
+        let response = client.get(url: server.construct() + "/blocks")
+        
+        do {
+            let result = try await response.get()
+            
+            switch result.status {
+            case .ok: break
+            case .internalServerError: return .failure(.unable)
+            default: return .failure(.unable)
+            }
+            
+            guard let body = result.body else { return .failure(.unable) }
+            guard let data = body.getData(at: 0, length: body.readableBytes) else { return .failure(.unable) }
+            guard let string = String(data: data, encoding: .utf8) else { return .failure(.unable) }
+            
+            var results: Set<Block.ID> = []
+            
+            let values = string.split(separator: ",")
+            for value in values {
+                guard let id = Block.ID(parsing: String(value)) else { continue }
+                results.insert(id)
+            }
+            
+            return .success(results)
+        } catch {
+            return .failure(.unable)
+        }
+    }
+    
+    public func checkBlock(id: Block.ID) async -> Result<Bool, BlockCheckError> {
+        let response = client.execute(.HEAD, url: server.construct() + "/block/" + id.description)
+        
+        do {
+            let result = try await response.get()
+            
+            switch result.status {
+            case .ok: return .success(true)
+            case .notFound: return .success(false)
+            default: return .failure(.unable)
+            }
+        } catch {
+            return .failure(.unable)
+        }
+    }
+    
     public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {
         let response = client.get(url: server.construct() + "/block/" + id.description)
         
@@ -64,36 +110,6 @@ public class ZeneaHTTPClient: BlockStorage {
             return .success(block.id)
         } catch {
             return .failure(.unavailable)
-        }
-    }
-    
-    public func listBlocks() async -> Result<Set<Block.ID>, BlockListError> {
-        let response = client.get(url: server.construct() + "/blocks")
-        
-        do {
-            let result = try await response.get()
-            
-            switch result.status {
-            case .ok: break
-            case .internalServerError: return .failure(.unable)
-            default: return .failure(.unable)
-            }
-            
-            guard let body = result.body else { return .failure(.unable) }
-            guard let data = body.getData(at: 0, length: body.readableBytes) else { return .failure(.unable) }
-            guard let string = String(data: data, encoding: .utf8) else { return .failure(.unable) }
-            
-            var results: Set<Block.ID> = []
-            
-            let values = string.split(separator: ",")
-            for value in values {
-                guard let id = Block.ID(parsing: String(value)) else { continue }
-                results.insert(id)
-            }
-            
-            return .success(results)
-        } catch {
-            return .failure(.unable)
         }
     }
 }
