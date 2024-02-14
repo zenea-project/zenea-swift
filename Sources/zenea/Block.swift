@@ -92,3 +92,11 @@ extension Block.ID.Algorithm: CustomStringConvertible {
         self.rawValue
     }
 }
+
+extension Block.ID.Algorithm {
+    public var bytes: Int {
+        switch self {
+        case .sha2_256: return 32
+        }
+    }
+}
