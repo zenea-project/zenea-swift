@@ -1,14 +1,14 @@
 import Foundation
 
-public class BlockStorageCache<Source: BlockStorage>: BlockStorageWrapper {
+public class BlockStorageCache: BlockStorageWrapper {
     public static var name: String { "cache" }
     
-    public var source: Source
+    public var source: BlockStorage
     
     private var list: Set<Block.ID>
     private var cache: [Block.ID: Block]
     
-    public init(source: Source) {
+    public init(source: BlockStorage) {
         self.source = source
         self.list = []
         self.cache = [:]

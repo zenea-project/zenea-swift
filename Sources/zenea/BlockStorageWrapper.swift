@@ -1,8 +1,6 @@
 public protocol BlockStorageWrapper: BlockStorage {
-    associatedtype Source: BlockStorage
-    
     static var name: String { get }
-    var source: Source { get }
+    var source: BlockStorage { get }
 }
 
 extension BlockStorageWrapper {
