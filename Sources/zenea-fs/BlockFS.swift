@@ -131,7 +131,10 @@ public class BlockFS: BlockStorage {
     
     public func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data {
         do {
-            let block = Block(content: try await content.read())
+            guard let content = try? await content.read() else { return .failure(.unable) }
+            guard content.count <= Block.maxBytes else { return .failure(.overflow) }
+            
+            let block = Block(content: content)
             
             var url = zeneaURL
             url.append("blocks")

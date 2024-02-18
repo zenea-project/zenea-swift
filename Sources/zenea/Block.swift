@@ -100,3 +100,7 @@ extension Block.ID.Algorithm {
         }
     }
 }
+
+extension Block {
+    public static let maxBytes: Int = 1<<16
+}

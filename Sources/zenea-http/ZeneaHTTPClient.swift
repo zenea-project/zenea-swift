@@ -87,6 +87,7 @@ public class ZeneaHTTPClient: BlockStorage {
     
     public func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data {
         guard let content = try? await content.read() else { return .failure(.unable) }
+        guard content.count <= Block.maxBytes else { return .failure(.overflow) }
         
         let block = Block(content: content)
         let response = client.post(url: server.construct() + "/block", body: .data(block.content))
