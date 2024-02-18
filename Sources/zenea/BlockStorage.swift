@@ -11,3 +11,13 @@ public protocol BlockStorage: CustomStringConvertible {
     @discardableResult
     func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data
 }
+
+extension BlockStorage {
+    public func putBlock(data: Data) async -> Result<Block, BlockPutError> {
+        await self.putBlock(content: [data])
+    }
+    
+    public func putBlock(block: Block) async -> Result<Block, BlockPutError> {
+        await self.putBlock(content: [block.content])
+    }
+}
