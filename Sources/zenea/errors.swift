@@ -16,6 +16,6 @@ public enum BlockPutError: Error {
     case overflow
     case unavailable
     case notPermitted
-    case exists
+    case exists(_ block: Block)
     case unable
 }

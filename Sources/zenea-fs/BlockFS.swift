@@ -145,7 +145,7 @@ public class BlockFS: BlockStorage {
             url.append(String(hash[4...]))
             
             if let info = try await FileSystem.shared.info(forFileAt: url) {
-                return .failure(info.type == .regular ? .exists : .unable)
+                return .failure(info.type == .regular ? .exists(block) : .unable)
             }
             
             let parent = url.removingLastComponent()

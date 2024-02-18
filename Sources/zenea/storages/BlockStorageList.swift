@@ -54,6 +54,7 @@ public class BlockStorageList: BlockStorage {
         for source in sources {
             switch await source.putBlock(content: content) {
             case .success(let block): result = block
+            case .failure(.exists(let block)): result = block
             case .failure(_): break
             }
         }

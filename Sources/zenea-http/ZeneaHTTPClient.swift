@@ -97,7 +97,7 @@ public class ZeneaHTTPClient: BlockStorage {
             
             switch result.status {
             case .ok: break
-            case .notFound: return .failure(.exists)
+            case .notFound: return .failure(.exists(block))
             case .badGateway: return .failure(.unavailable)
             case .forbidden: return .failure(.notPermitted)
             default: return .failure(.unable)

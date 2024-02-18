@@ -61,6 +61,10 @@ public class BlockStorageCache: BlockStorageWrapper {
             self.list.insert(block.id)
             self.cache[block.id] = block
             return .success(block)
+        case .failure(.exists(let block)):
+            self.list.insert(block.id)
+            self.cache[block.id] = block
+            return .failure(.exists(block))
         case .failure(let error):
             return .failure(error)
         }
