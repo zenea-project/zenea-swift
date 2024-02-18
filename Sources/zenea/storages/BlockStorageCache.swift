@@ -1,7 +1,7 @@
 import Foundation
 
 public class BlockStorageCache: BlockStorageWrapper {
-    public static var name: String { "cache" }
+    public var name: String { "cache" }
     
     public var source: BlockStorage
     
