@@ -149,7 +149,7 @@ public class BlockFS: BlockStorage {
             }
             
             let parent = url.removingLastComponent()
-            try await FileSystem.shared.createDirectory(at: parent, withIntermediateDirectories: true)
+            try? await FileSystem.shared.createDirectory(at: parent, withIntermediateDirectories: true)
             
             let handle = try await FileSystem.shared.openFile(forWritingAt: url, options: .newFile(replaceExisting: false))
             defer { Task { try? await handle.close(makeChangesVisible: true) } }
