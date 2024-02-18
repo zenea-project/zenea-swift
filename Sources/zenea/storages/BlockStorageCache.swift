@@ -1,3 +1,4 @@
+import NIOCore
 import Foundation
 
 public class BlockStorageCache: BlockStorageWrapper {
@@ -54,14 +55,12 @@ public class BlockStorageCache: BlockStorageWrapper {
         }
     }
     
-    public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
-        let block = Block(content: content)
-        
+    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data {
         switch await self.source.putBlock(content: content) {
-        case .success(let id):
-            self.list.insert(id)
-            self.cache[id] = block
-            return .success(id)
+        case .success(let block):
+            self.list.insert(block.id)
+            self.cache[block.id] = block
+            return .success(block)
         case .failure(let error):
             return .failure(error)
         }

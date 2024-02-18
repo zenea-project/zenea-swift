@@ -1,3 +1,4 @@
+import Vapor
 import Foundation
 
 public protocol BlockStorage: CustomStringConvertible {
@@ -8,5 +9,5 @@ public protocol BlockStorage: CustomStringConvertible {
     func checkBlock(id: Block.ID) async -> Result<Bool, BlockCheckError>
     
     @discardableResult
-    func putBlock(content: Data) async -> Result<Block.ID, BlockPutError>
+    func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data
 }

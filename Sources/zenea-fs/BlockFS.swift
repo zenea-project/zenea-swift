@@ -129,43 +129,34 @@ public class BlockFS: BlockStorage {
         return .success(block)
     }
     
-    public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
-        let block = Block(content: content)
-        
-        var url = zeneaURL
-        url.append("blocks")
-        
-        let hash = block.id.hash.toHexString()
-        url.append(String(hash[0..<2]))
-        url.append(String(hash[2..<4]))
-        url.append(String(hash[4...]))
-        
-        var isDir: ObjCBool = false
-        if FileManager.default.fileExists(atPath: url.string, isDirectory: &isDir) {
-            return isDir.boolValue ? .failure(.unable) : .failure(.exists)
-        }
-        
-        let parent = url.removingLastComponent()
-        if !FileManager.default.fileExists(atPath: parent.string, isDirectory: &isDir) {
-            do {
-                try FileManager.default.createDirectory(atPath: parent.string, withIntermediateDirectories: true)
-            } catch {
-                return .failure(.unable)
-            }
-        } else if !isDir.boolValue {
-            return .failure(.unable)
-        }
-        
+    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data {
         do {
+            let block = Block(content: try await content.read())
+            
+            var url = zeneaURL
+            url.append("blocks")
+            
+            let hash = block.id.hash.toHexString()
+            url.append(String(hash[0..<2]))
+            url.append(String(hash[2..<4]))
+            url.append(String(hash[4...]))
+            
+            if let info = try await FileSystem.shared.info(forFileAt: url) {
+                return .failure(info.type == .regular ? .exists : .unable)
+            }
+            
+            let parent = url.removingLastComponent()
+            try await FileSystem.shared.createDirectory(at: parent, withIntermediateDirectories: true)
+            
             let handle = try await FileSystem.shared.openFile(forWritingAt: url, options: .newFile(replaceExisting: false))
-            defer { Task { try? await handle.close() } }
+            defer { Task { try? await handle.close(makeChangesVisible: true) } }
             
             try await handle.write(contentsOf: block.content, toAbsoluteOffset: 0)
+            
+            return .success(block)
         } catch {
             return .failure(.unable)
         }
-        
-        return .success(block.id)
     }
 }
 

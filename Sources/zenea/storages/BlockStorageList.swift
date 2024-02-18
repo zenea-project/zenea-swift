@@ -1,3 +1,4 @@
+import NIOCore
 import Foundation
 
 public class BlockStorageList: BlockStorage {
@@ -47,12 +48,12 @@ public class BlockStorageList: BlockStorage {
         return .success(false)
     }
     
-    public func putBlock(content: Data) async -> Result<Block.ID, BlockPutError> {
-        var result: Block.ID? = nil
+    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data {
+        var result: Block? = nil
         
         for source in sources {
             switch await source.putBlock(content: content) {
-            case .success(let id): result = id
+            case .success(let block): result = block
             case .failure(_): break
             }
         }

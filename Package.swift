@@ -35,6 +35,7 @@ let package = Package(
             name: "zenea",
             dependencies: [
                 .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "Vapor", package: "vapor"),
                 .target(name: "utils")
             ]
         ),
