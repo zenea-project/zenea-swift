@@ -163,15 +163,14 @@ extension BlockFS {
 }
 
 fileprivate func scanDir(_ dir: FilePath) async -> DirectoryEntries? {
-    let handle: DirectoryFileHandle
-    
     do {
-        handle = try await FileSystem.shared.openDirectory(atPath: dir)
+        let handle = try await FileSystem.shared.openDirectory(atPath: dir)
+        
+        let contents = handle.listContents(recursive: false)
+        try? await handle.close()
+        
+        return contents
     } catch {
         return nil
     }
-    
-    defer { Task { try? await handle.close() } }
-    
-    return handle.listContents(recursive: false)
 }
