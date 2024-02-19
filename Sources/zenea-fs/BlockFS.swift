@@ -149,7 +149,7 @@ fileprivate class AutoClosingDirectoryContents: AsyncSequence {
     }
     
     deinit {
-        Task { try? await handle.close() }
+        _ = try? handle.detachUnsafeFileDescriptor()
     }
     
     func makeAsyncIterator() -> DirectoryEntries.AsyncIterator {
