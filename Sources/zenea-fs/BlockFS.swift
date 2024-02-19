@@ -19,54 +19,26 @@ public class BlockFS: BlockStorage {
         var url = zeneaURL
         url.append("blocks")
         
-        guard let dir1 = await scanDir(url) else { return .failure(.unable) }
-        
-        // first level, filter valid entries and expand those
-        let files1 = dir1.compactMap { dir -> ([UInt8], DirectoryEntries)? in
-            guard dir.type == .directory else { return nil }
-            
-            guard let byte = [UInt8](hexString: dir.name.string) else { return nil  }
-            guard byte.count == 1 else { return nil }
-            
-            guard let contents = await scanDir(dir.path) else { return nil }
-            return (byte, contents)
-        }
-        
-        // second level, same
-        let files2 = files1.flatMap { (bytes, files) in
-            files.compactMap { dir -> ([UInt8], DirectoryEntries)? in
-                guard dir.type == .directory else { return nil }
-                
-                guard let byte = [UInt8](hexString: dir.name.string) else { return nil }
-                guard byte.count == 1 else { return nil }
-                
-                guard let contents = await scanDir(dir.path) else { return nil }
-                return (bytes + byte, contents)
-            }
-        }
-        
-        // third level, filter valid files and turn into block ids
-        let ids = files2.flatMap { (bytes, files) in
-            files.compactMap { dir -> Block.ID? in
-                guard dir.type == .regular else { return nil }
-                
-                guard let decoded = [UInt8](hexString: dir.name.string) else { return nil }
-                guard decoded.count == SHA256.byteCount-2 else { return nil }
-                
-                return Block.ID(algorithm: .sha2_256, hash: bytes+decoded)
-            }
-        }
-        
-        var results: Set<Block.ID> = []
         do {
-            for try await id in ids {
-                results.insert(id)
+            var results: Set<Block.ID> = []
+            
+            let files1 = try await scanDir(url)
+            let files2 = try await processIntermediates(files1)
+            let files3 = await processIntermediates(files2)
+            
+            for (previousBytes, file) in files3 {
+                guard file.type == .regular else { continue }
+                
+                guard let bytes = [UInt8](hexString: file.name.string) else { continue }
+                guard bytes.count == SHA256.byteCount - previousBytes.count else { continue }
+                
+                results.insert(Block.ID(algorithm: .sha2_256, hash: previousBytes + bytes))
             }
+            
+            return .success(results)
         } catch {
-            print(error)
+            return .failure(.unable)
         }
-        
-        return .success(results)
     }
     
     public func checkBlock(id: Block.ID) async -> Result<Bool, BlockCheckError> {
@@ -162,15 +134,71 @@ extension BlockFS {
     public var description: String { self.zeneaURL.string }
 }
 
-fileprivate func scanDir(_ dir: FilePath) async -> DirectoryEntries? {
+fileprivate func scanDir(_ dir: FilePath) async throws -> AutoClosingDirectoryContents {
+    let handle = try await FileSystem.shared.openDirectory(atPath: dir)
+    return .init(handle: handle)
+}
+
+fileprivate class AutoClosingDirectoryContents: AsyncSequence {
+    typealias Element = DirectoryEntry
+    
+    var handle: DirectoryFileHandle
+    
+    init(handle: DirectoryFileHandle) {
+        self.handle = handle
+    }
+    
+    deinit {
+        Task { try? await handle.close() }
+    }
+    
+    func makeAsyncIterator() -> DirectoryEntries.AsyncIterator {
+        handle.listContents(recursive: false).makeAsyncIterator()
+    }
+}
+
+fileprivate func processIntermediate(_ entry: DirectoryEntry, bytes: [UInt8]) async -> ([UInt8], [DirectoryEntry])? {
+    guard entry.type == .directory else { return nil }
+    
+    guard let newBytes = [UInt8](hexString: entry.name.string) else { return nil }
+    guard newBytes.count == 1 else { return nil }
+    
+    var contents: [DirectoryEntry] = []
     do {
-        let handle = try await FileSystem.shared.openDirectory(atPath: dir)
-        
-        let contents = handle.listContents(recursive: false)
-        try? await handle.close()
-        
-        return contents
+        for try await file in try await scanDir(entry.path) {
+            contents.append(file)
+        }
     } catch {
         return nil
     }
+    
+    return (bytes + newBytes, contents)
+}
+
+fileprivate func processIntermediates<Sequence>(_ entries: Sequence) async throws -> [([UInt8], DirectoryEntry)] where Sequence: AsyncSequence, Sequence.Element == DirectoryEntry {
+    var results: [([UInt8], DirectoryEntry)] = []
+    
+    for try await entry in entries {
+        guard let (bytes, subEntries) = await processIntermediate(entry, bytes: []) else { continue }
+        
+        for subEntry in subEntries {
+            results.append((bytes, subEntry))
+        }
+    }
+    
+    return results
+}
+
+fileprivate func processIntermediates(_ entries: [([UInt8], DirectoryEntry)]) async -> [([UInt8], DirectoryEntry)] {
+    var results: [([UInt8], DirectoryEntry)] = []
+    
+    for (previousBytes, entry) in entries {
+        guard let (bytes, subEntries) = await processIntermediate(entry, bytes: []) else { continue }
+        
+        for subEntry in subEntries {
+            results.append((previousBytes + bytes, subEntry))
+        }
+    }
+    
+    return results
 }
