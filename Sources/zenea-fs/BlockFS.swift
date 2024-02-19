@@ -134,27 +134,21 @@ extension BlockFS {
     public var description: String { self.zeneaURL.string }
 }
 
-fileprivate func scanDir(_ dir: FilePath) async throws -> AutoClosingDirectoryContents {
+fileprivate func scanDir(_ dir: FilePath) async throws -> [DirectoryEntry] {
     let handle = try await FileSystem.shared.openDirectory(atPath: dir)
-    return .init(handle: handle)
-}
-
-fileprivate class AutoClosingDirectoryContents: AsyncSequence {
-    typealias Element = DirectoryEntry
+    var results: [DirectoryEntry] = []
     
-    var handle: DirectoryFileHandle
-    
-    init(handle: DirectoryFileHandle) {
-        self.handle = handle
+    do {
+        for try await entry in handle.listContents(recursive: false) {
+            results += [entry]
+        }
+        try? await handle.close()
+    } catch {
+        try? await handle.close()
+        throw error
     }
     
-    deinit {
-        _ = try? handle.detachUnsafeFileDescriptor()
-    }
-    
-    func makeAsyncIterator() -> DirectoryEntries.AsyncIterator {
-        handle.listContents(recursive: false).makeAsyncIterator()
-    }
+    return results
 }
 
 fileprivate func processIntermediate(_ entry: DirectoryEntry, bytes: [UInt8]) async -> ([UInt8], [DirectoryEntry])? {
