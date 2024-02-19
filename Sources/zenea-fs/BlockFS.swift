@@ -62,7 +62,9 @@ public class BlockFS: BlockStorage {
             for try await id in ids {
                 results.insert(id)
             }
-        } catch { }
+        } catch {
+            print(error)
+        }
         
         return .success(results)
     }
