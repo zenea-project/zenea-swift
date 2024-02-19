@@ -22,7 +22,7 @@ public class BlockFS: BlockStorage {
         guard let dir1 = await scanDir(url) else { return .failure(.unable) }
         
         // first level, filter valid entries and expand those
-        var files1 = dir1.compactMap { dir -> ([UInt8], DirectoryEntries)? in
+        let files1 = dir1.compactMap { dir -> ([UInt8], DirectoryEntries)? in
             guard dir.type == .directory else { return nil }
             
             guard let byte = [UInt8](hexString: dir.name.string) else { return nil  }
