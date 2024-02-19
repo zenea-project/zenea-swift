@@ -23,16 +23,24 @@ public class BlockFS: BlockStorage {
             var results: Set<Block.ID> = []
             
             let files1 = try await scanDir(url)
-            let files2 = await processIntermediates(files1)
-            let files3 = await processIntermediates(files2)
             
-            for (previousBytes, file) in files3 {
-                guard file.type == .regular else { continue }
+            for try await file1 in files1 {
+                guard let (bytes1, files2) = await processIntermediate(file1, bytes: []) else { continue }
                 
-                guard let bytes = [UInt8](hexString: file.name.string) else { continue }
-                guard bytes.count == SHA256.byteCount - previousBytes.count else { continue }
-                
-                results.insert(Block.ID(algorithm: .sha2_256, hash: previousBytes + bytes))
+                for file2 in files2 {
+                    guard let (bytes2, files3) = await processIntermediate(file2, bytes: []) else { continue }
+                    
+                    for file3 in files3 {
+                        guard file3.type == .regular else { continue }
+                        
+                        let previousBytes = bytes1 + bytes2
+                        
+                        guard let bytes = [UInt8](hexString: file3.name.string) else { continue }
+                        guard bytes.count == SHA256.byteCount - previousBytes.count else { continue }
+                        
+                        results.insert(Block.ID(algorithm: .sha2_256, hash: previousBytes + bytes))
+                    }
+                }
             }
             
             return .success(results)
@@ -167,32 +175,4 @@ fileprivate func processIntermediate(_ entry: DirectoryEntry, bytes: [UInt8]) as
     }
     
     return (bytes + newBytes, contents)
-}
-
-fileprivate func processIntermediates(_ entries: [DirectoryEntry]) async -> [([UInt8], DirectoryEntry)] {
-    var results: [([UInt8], DirectoryEntry)] = []
-    
-    for entry in entries {
-        guard let (bytes, subEntries) = await processIntermediate(entry, bytes: []) else { continue }
-        
-        for subEntry in subEntries {
-            results.append((bytes, subEntry))
-        }
-    }
-    
-    return results
-}
-
-fileprivate func processIntermediates(_ entries: [([UInt8], DirectoryEntry)]) async -> [([UInt8], DirectoryEntry)] {
-    var results: [([UInt8], DirectoryEntry)] = []
-    
-    for (previousBytes, entry) in entries {
-        guard let (bytes, subEntries) = await processIntermediate(entry, bytes: []) else { continue }
-        
-        for subEntry in subEntries {
-            results.append((previousBytes + bytes, subEntry))
-        }
-    }
-    
-    return results
 }
