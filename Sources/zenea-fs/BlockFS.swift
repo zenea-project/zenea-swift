@@ -23,7 +23,7 @@ public class BlockFS: BlockStorage {
             var results: Set<Block.ID> = []
             
             let files1 = try await scanDir(url)
-            let files2 = try await processIntermediates(files1)
+            let files2 = await processIntermediates(files1)
             let files3 = await processIntermediates(files2)
             
             for (previousBytes, file) in files3 {
@@ -169,10 +169,10 @@ fileprivate func processIntermediate(_ entry: DirectoryEntry, bytes: [UInt8]) as
     return (bytes + newBytes, contents)
 }
 
-fileprivate func processIntermediates<Sequence>(_ entries: Sequence) async throws -> [([UInt8], DirectoryEntry)] where Sequence: AsyncSequence, Sequence.Element == DirectoryEntry {
+fileprivate func processIntermediates(_ entries: [DirectoryEntry]) async -> [([UInt8], DirectoryEntry)] {
     var results: [([UInt8], DirectoryEntry)] = []
     
-    for try await entry in entries {
+    for entry in entries {
         guard let (bytes, subEntries) = await processIntermediate(entry, bytes: []) else { continue }
         
         for subEntry in subEntries {
