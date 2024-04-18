@@ -7,40 +7,25 @@ let package = Package(
         .macOS("13.3")
     ],
     products: [
-        .library(name: "zenea-swift", targets: ["zenea", "zenea-fs", "zenea-http"])
+        .library(name: "zenea-swift", targets: ["Zenea", "ZeneaCache"])
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.92.1"),
-        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.2.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", from: "2.63.0")
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.3.0") 
     ],
     targets: [
         .target(
-            name: "zenea-fs",
+            name: "Zenea",
             dependencies: [
-                .product(name: "_NIOFileSystem", package: "swift-nio"),
-                .target(name: "zenea"),
-                .target(name: "utils")
-            ]
+                .product(name: "Crypto", package: "swift-crypto")
+            ],
+            path: "./Sources/zenea"
         ),
         .target(
-            name: "zenea-http",
+            name: "ZeneaCache",
             dependencies: [
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "Crypto", package: "swift-crypto"),
-                .target(name: "zenea")
-            ]
-        ),
-        .target(
-            name: "zenea",
-            dependencies: [
-                .product(name: "Crypto", package: "swift-crypto"),
-                .product(name: "Vapor", package: "vapor"),
-                .target(name: "utils")
-            ]
-        ),
-        .target(
-            name: "utils"
+                .target(name: "Zenea")
+            ],
+            path: "./Sources/zenea-cache"
         )
     ]
 )

@@ -1,27 +1,33 @@
-import NIOCore
 import Foundation
+import Zenea
 
-public class BlockStorageCache: BlockStorageWrapper {
-    public var name: String { "cache" }
+public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage {
+    public static var name: String { "cache" }
     
-    public var source: BlockStorage
+    public var source: Source
     
     private var list: Set<Block.ID>
     private var cache: [Block.ID: Block]
     
-    public init(source: BlockStorage) {
+    public init(source: Source) {
         self.source = source
         self.list = []
         self.cache = [:]
     }
     
-    public func listBlocks() -> Result<Set<Block.ID>, BlockListError> {
+    public init(@BlockStorageBuilder sources: () -> Source) {
+        self.source = sources()
+        self.list = []
+        self.cache = [:]
+    }
+    
+    public func listBlocks() -> Result<Set<Block.ID>, Block.ListError> {
         return .success(self.list)
     }
     
-    public func updateList() async -> Result<(), BlockListError> {
+    public func updateList() async -> Result<(), Block.ListError> {
         switch await self.source.listBlocks() {
-        case .success(let blocks): 
+        case .success(let blocks):
             self.list = blocks
             self.cache = self.cache.filter { blocks.contains($0.key) }
             return .success(())
@@ -30,7 +36,7 @@ public class BlockStorageCache: BlockStorageWrapper {
         }
     }
     
-    public func checkBlock(id: Block.ID) async -> Result<Bool, BlockCheckError> {
+    public func checkBlock(id: Block.ID) async -> Result<Bool, Block.CheckError> {
         if self.list.contains(id) { return .success(true) }
         
         switch await self.source.checkBlock(id: id) {
@@ -42,7 +48,7 @@ public class BlockStorageCache: BlockStorageWrapper {
         }
     }
     
-    public func fetchBlock(id: Block.ID) async -> Result<Block, BlockFetchError> {
+    public func fetchBlock(id: Block.ID) async -> Result<Block, Block.FetchError> {
         if let block = self.cache[id] { return .success(block) }
         
         switch await self.source.fetchBlock(id: id) {
@@ -55,7 +61,7 @@ public class BlockStorageCache: BlockStorageWrapper {
         }
     }
     
-    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, BlockPutError> where Bytes: AsyncSequence, Bytes.Element == Data {
+    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, Block.PutError> where Bytes: AsyncSequence, Bytes.Element == Data {
         switch await self.source.putBlock(content: content) {
         case .success(let block):
             self.list.insert(block.id)
