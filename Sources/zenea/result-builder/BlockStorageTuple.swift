@@ -1,7 +1,10 @@
 import Foundation
 
+/// A combination block storage which wraps two base storages of independent types.
 struct BlockStorageTuple<Source1, Source2>: BlockStorage where Source1: BlockStorage, Source2: BlockStorage {
+    /// The first of two wrapped source storages.
     public var source1: Source1
+    /// The second of two wrapped source storages.
     public var source2: Source2
     
     public var description: String {

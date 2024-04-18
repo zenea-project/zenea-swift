@@ -1,6 +1,7 @@
 import Foundation
 
 extension Array where Element == UInt8 {
+    /// Create an array from parsing a hexadecimal string.
     public init?(hexString: String) {
         guard hexString.count.isMultiple(of: 2), !hexString.isEmpty else { return nil }
         self.init(repeating: 0, count: hexString.count/2)
@@ -17,6 +18,7 @@ extension Array where Element == UInt8 {
 }
 
 extension Data {
+    /// Create data from parsing a hexadecimal string.
     public init?(hexString: String) {
         guard hexString.count.isMultiple(of: 2), !hexString.isEmpty else { return nil }
         self.init(repeating: 0, count: hexString.count/2)
@@ -33,6 +35,7 @@ extension Data {
 }
 
 extension Collection where Element == UInt8 {
+    /// A hexadecimal representation of this collection's elements.
     public func toHexString() -> String {
         return self.reduce(into: "") {
             if let (char1, char2) = convertHexToChars($1) {

@@ -1,3 +1,4 @@
+/// Builds a single- or multi-source ``BlockStorage`` from a resultBuilder function.
 @resultBuilder
 public enum BlockStorageBuilder {
     public static func buildPartialBlock<Component>(first component: Component) -> some BlockStorage where Component: BlockStorage {

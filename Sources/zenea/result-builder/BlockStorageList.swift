@@ -1,6 +1,8 @@
 import Foundation
 
+/// A multi-source block storage which wraps a list of same-type base storages.
 struct BlockStorageList<SourceType>: BlockStorage where SourceType: BlockStorage {
+    /// The source storages list that this instance wraps.
     public var sources: [SourceType]
     
     public var description: String {

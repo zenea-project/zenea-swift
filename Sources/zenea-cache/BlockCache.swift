@@ -2,7 +2,7 @@ import Foundation
 import Zenea
 
 public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage {
-    public static var name: String { "cache" }
+    public var name: String { "cache" }
     
     public var source: Source
     
