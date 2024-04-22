@@ -3,23 +3,19 @@ This package is a swift library for the [Zenea Project](https://github.com/glasf
 
 It includes the following targets:
 
-### `zenea`
+### `Zenea`
 A base library providing types and protocols.
 - [`Block`](Sources/zenea/Block.swift) - an implementation of a Zenea Data Layer block with ID and content.
-- [`BlockStorage`](Sources/zenea/BlockStorage.swift) - a protocol for storage systems that can list, fetch or put blocks.
+- [`BlockStorage`](Sources/zenea/BlockStorage.swift) - a protocol for storage systems that can list, check, fetch and put blocks.
 
-### `zenea-fs`
-A local-file-based block storage system, built on [swift-nio's](https://github.com/apple/swift-nio) `NIOFileSystem`.
-- [`BlockFS`](Sources/zenea-fs/BlockFS.swift) - a file system implementation of the `BlockStorage` protocol.
-
-### `zenea-http`
-An HTTP client for a web-based block storage system, built on [Vapor](https://github.com/vapor/vapor).
-- [`ZeneaHTTPClient`](Sources/zenea-http/ZeneaHTTPClient.swift) - an HTTP client implementation of the `BlockStorage` protocol.
+### `ZeneaCache`
+A very simple block caching system, implemented as a [`BlockStorageWrapper`](Sources/zenea/BlockStorageWrapper.swift).
+- [`BlockCache`](Sources/zenea-cache/BlockCache.swift) - a Zenea Block cache.
 
 # How to Use
 If you haven't already, download the latest version of Swift, but at least version 5.9.2. On macOS, the recommended way to do this is by downloading the Xcode app. On Linux, you'll want to use [swiftly](https://github.com/swift-server/swiftly).
 
-To use the library targets `zenea`, `zenea-fs` and `zenea-http`, simply include this package in your swift dependencies.
+To use the library targets `Zenea` and `ZeneaCache`, simply include this package in your swift dependencies.
 
 ```swift
 let package = Package(
@@ -28,13 +24,13 @@ let package = Package(
         .macOS("13.3")
     ],
     dependencies: [
-        .package(url: "https://github.com/glasfisch3000/zenea-swift.git", from: "1.0.0-alpha6")
+        .package(url: "https://github.com/zenea-project/zenea-swift.git", from: "2.0.0")
     ],
     targets: [
         .target(
             name: "my-example-target",
             dependencies: [
-                .product(name: "zenea-swift", package: "zenea-swift")
+                .product(name: "Zenea", package: "zenea-swift")
             ]
         )
     ]
@@ -43,9 +39,9 @@ let package = Package(
 
 ```swift
 import Foundation
-import zenea
+import Zenea
 
 let block = Block(content: Data(count: 1))
 ```
 
-NOTE: This package may not work on systems that do not provide an adequate `Foundation` library. In any recent release of macOS, this should not be a problem. However, on Linux systems you might be using an older version of the library or it might be missing entirely. Apple is currently working on making an [open-source swift version](https://github.com/apple/swift-foundation) of that package that can be used as a dependency on all systems, but as it is still in an early stage, you could run into problems compiling this package.
+NOTE: This package may not work on systems that do not provide an adequate `Foundation` library. In any recent release of macOS, this should not be a problem. However, on Linux systems you might be using an older version of the library or it might be missing entirely. Apple is currently working on making an [open-source swift version](https://github.com/apple/swift-foundation) of that package that can be used as a dependency on all systems, but as it is still in an early stage, you might run into problems compiling this package.
