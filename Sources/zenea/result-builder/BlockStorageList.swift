@@ -48,7 +48,7 @@ struct BlockStorageList<SourceType>: BlockStorage where SourceType: BlockStorage
         return .failure(resultError)
     }
     
-    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, Block.PutError> where Bytes: AsyncSequence, Bytes.Element == Data {
+    public func putBlock(content: Data) async -> Result<Block, Block.PutError> {
         var result: Block? = nil
         
         for source in sources {

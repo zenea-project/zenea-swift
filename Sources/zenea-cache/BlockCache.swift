@@ -68,7 +68,7 @@ public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage 
         }
     }
     
-    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, Block.PutError> where Bytes: AsyncSequence, Bytes.Element == Data {
+    public func putBlock(content: Data) async -> Result<Block, Block.PutError> {
         switch await self.source.putBlock(content: content) {
         case .success(let block):
             self.list.insert(block.id)

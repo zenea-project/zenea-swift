@@ -46,7 +46,7 @@ struct BlockStorageTuple<Source1, Source2>: BlockStorage where Source1: BlockSto
         return await source2.checkBlock(id: id)
     }
     
-    public func putBlock<Bytes>(content: Bytes) async -> Result<Block, Block.PutError> where Bytes: AsyncSequence, Bytes.Element == Data {
+    public func putBlock(content: Data) async -> Result<Block, Block.PutError> {
         var result: Block? = nil
         
         switch await source1.putBlock(content: content) {
