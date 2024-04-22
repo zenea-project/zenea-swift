@@ -30,7 +30,7 @@ let package = Package(
         .target(
             name: "my-example-target",
             dependencies: [
-                .product(name: "Zenea", package: "zenea-swift")
+                .product(name: "zenea-swift", package: "zenea-swift")
             ]
         )
     ]
