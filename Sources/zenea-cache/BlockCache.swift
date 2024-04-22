@@ -1,20 +1,26 @@
 import Foundation
 import Zenea
 
+/// A block storage wrapper that adds basic caching functionality.
 public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage {
     public var name: String { "cache" }
     
     public var source: Source
     
+    /// A hashed index of all the blocks IDs that are known to this cache.
     private var list: Set<Block.ID>
+    
+    /// The underlying cache storage.
     private var cache: [Block.ID: Block]
     
+    /// Create a block cache instance from a source storage.
     public init(source: Source) {
         self.source = source
         self.list = []
         self.cache = [:]
     }
     
+    /// Create a block cache instance from a ``BlockStorageBuilder`` source.
     public init(@BlockStorageBuilder sources: () -> Source) {
         self.source = sources()
         self.list = []
@@ -25,6 +31,7 @@ public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage 
         return .success(self.list)
     }
     
+    /// Updates the cache's block index.
     public func updateList() async -> Result<(), Block.ListError> {
         switch await self.source.listBlocks() {
         case .success(let blocks):
