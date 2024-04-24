@@ -1,14 +1,6 @@
 /// Builds a single- or multi-source ``BlockStorage`` from a resultBuilder function.
 @resultBuilder
 public enum BlockStorageBuilder {
-    public static func buildPartialBlock<Component>(first component: Component) -> Component where Component: BlockStorage {
-        return component
-    }
-    
-    public static func buildPartialBlock<Accumulated, Next>(accumulated: Accumulated?, next: Next) -> BlockStorageTuple<Accumulated, Next> where Accumulated: BlockStorage, Next: BlockStorage {
-        BlockStorageTuple(source1: accumulated, source2: next)
-    }
-    
     public static func buildArray<Component>(_ components: [Component]) -> BlockStorageList<Component> where Component: BlockStorage {
         BlockStorageList(sources: components)
     }
