@@ -5,6 +5,10 @@ public struct BlockStorageList<SourceType>: BlockStorage where SourceType: Block
     /// The source storages list that this instance wraps.
     public var sources: [SourceType]
     
+    public init(sources: [SourceType]) {
+        self.sources = sources
+    }
+    
     public var description: String {
         sources.map(\.description).joined(separator: ", ")
     }

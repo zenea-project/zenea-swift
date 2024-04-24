@@ -7,6 +7,11 @@ public struct BlockStorageTuple<Source1, Source2>: BlockStorage where Source1: B
     /// The second of two wrapped source storages.
     public var source2: Source2
     
+    public init(source1: Source1?, source2: Source2) {
+        self.source1 = source1
+        self.source2 = source2
+    }
+    
     public var description: String {
         if let source1 = source1 {
             source1.description + ", " + source2.description
