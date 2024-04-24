@@ -5,7 +5,7 @@ public enum BlockStorageBuilder {
         return component
     }
     
-    public static func buildPartialBlock<Accumulated, Next>(accumulated: Accumulated, next: Next) -> some BlockStorage where Accumulated: BlockStorage, Next: BlockStorage {
+    public static func buildPartialBlock<Accumulated, Next>(accumulated: Accumulated?, next: Next) -> some BlockStorage where Accumulated: BlockStorage, Next: BlockStorage {
         BlockStorageTuple(source1: accumulated, source2: next)
     }
     
