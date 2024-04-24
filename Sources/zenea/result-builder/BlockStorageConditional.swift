@@ -1,6 +1,6 @@
 import Foundation
 
-enum BlockStorageConditional<TrueContent, FalseContent>: BlockStorage where TrueContent: BlockStorage, FalseContent: BlockStorage {
+public enum BlockStorageConditional<TrueContent, FalseContent>: BlockStorage where TrueContent: BlockStorage, FalseContent: BlockStorage {
     case `true`(TrueContent)
     case `false`(FalseContent)
     
