@@ -13,12 +13,12 @@ public enum BlockStorageBuilder {
         BlockStorageList(sources: components)
     }
     
-    public static func buildEither<TrueContent, FalseContent>(first content: TrueContent) -> BlockStorageConditional<TrueContent, FalseContent> where TrueContent: BlockStorage, FalseContent: BlockStorage {
-        .true(content)
+    public static func buildEither<TrueContent, FalseContent>(first content: TrueContent) -> some BlockStorage where TrueContent: BlockStorage, FalseContent: BlockStorage {
+        BlockStorageConditional<TrueContent, FalseContent>.true(content)
     }
     
-    public static func buildEither<TrueContent, FalseContent>(second content: FalseContent) -> BlockStorageConditional<TrueContent, FalseContent> where TrueContent: BlockStorage, FalseContent: BlockStorage {
-        .false(content)
+    public static func buildEither<TrueContent, FalseContent>(second content: FalseContent) -> some BlockStorage where TrueContent: BlockStorage, FalseContent: BlockStorage {
+        BlockStorageConditional<TrueContent, FalseContent>.false(content)
     }
     
     public static func buildBlock<C1, C2>(_ c1: C1, _ c2: C2) -> some BlockStorage where C1: BlockStorage, C2: BlockStorage {
