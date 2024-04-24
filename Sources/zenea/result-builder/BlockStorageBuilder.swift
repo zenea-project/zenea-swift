@@ -9,7 +9,7 @@ public enum BlockStorageBuilder {
         BlockStorageTuple(source1: accumulated, source2: next)
     }
     
-    public static func buildArray<Component>(_ components: [Component]) -> some BlockStorage where Component: BlockStorage {
+    public static func buildArray<Component>(_ components: [Component]) -> BlockStorageList<Component> where Component: BlockStorage {
         BlockStorageList(sources: components)
     }
     
