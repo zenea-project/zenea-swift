@@ -13,7 +13,7 @@ public enum BlockStorageBuilder {
         .false(content)
     }
     
-    public static func buildBlock<C1, C2>(_ c1: C1, _ c2: C2) -> some BlockStorage where C1: BlockStorage, C2: BlockStorage {
+    public static func buildBlock<C1, C2>(_ c1: C1, _ c2: C2) -> BlockStorageTuple<C1, C2> where C1: BlockStorage, C2: BlockStorage {
         BlockStorageTuple(source1: c1, source2: c2)
     }
 }
