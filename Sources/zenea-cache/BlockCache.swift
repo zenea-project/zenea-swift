@@ -2,10 +2,10 @@ import Foundation
 import Zenea
 
 /// A block storage wrapper that adds basic caching functionality.
-public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage {
-    public var name: String { "cache" }
+public actor BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage {
+    public nonisolated var name: String { "cache" }
     
-    public var source: Source
+    public let source: Source
     
     /// A hashed index of all the blocks IDs that are known to this cache.
     private var list: Set<Block.ID>
@@ -83,3 +83,5 @@ public class BlockCache<Source>: BlockStorageWrapper where Source: BlockStorage 
         }
     }
 }
+
+extension BlockCache: Sendable where Source: Sendable { }

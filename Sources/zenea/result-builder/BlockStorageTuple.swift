@@ -71,3 +71,9 @@ public struct BlockStorageTuple<Source1, Source2>: BlockStorage where Source1: B
         return .success(result)
     }
 }
+
+extension BlockStorageTuple: Equatable where Source1: Equatable, Source2: Equatable { }
+extension BlockStorageTuple: Hashable where Source1: Hashable, Source2: Hashable { }
+extension BlockStorageTuple: Sendable where Source1: Sendable, Source2: Sendable { }
+extension BlockStorageTuple: Encodable where Source1: Encodable, Source2: Encodable { }
+extension BlockStorageTuple: Decodable where Source1: Decodable, Source2: Decodable { }

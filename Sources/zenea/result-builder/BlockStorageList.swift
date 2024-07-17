@@ -66,3 +66,9 @@ public struct BlockStorageList<SourceType>: BlockStorage where SourceType: Block
         return .success(result)
     }
 }
+
+extension BlockStorageList: Equatable where SourceType: Equatable { }
+extension BlockStorageList: Hashable where SourceType: Hashable { }
+extension BlockStorageList: Sendable where SourceType: Sendable { }
+extension BlockStorageList: Encodable where SourceType: Encodable { }
+extension BlockStorageList: Decodable where SourceType: Decodable { }
